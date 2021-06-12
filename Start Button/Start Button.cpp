@@ -7,6 +7,9 @@
 #define MAX_LOADSTRING 100
 
 // Global Variables:
+HWND hWnd;
+HBITMAP startBitmap;
+
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
@@ -17,6 +20,7 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -26,7 +30,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: Place code here.
-
+    startBitmap = (HBITMAP)::LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP1), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_STARTBUTTON, szWindowClass, MAX_LOADSTRING);
@@ -108,6 +112,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
+   int Style;
+   Style = GetWindowLong(hWnd, GWL_STYLE);
+   Style = Style || WS_CAPTION;
+   Style = Style || WS_SYSMENU;
+   SetWindowLong(hWnd, GWL_STYLE, Style);
+
    return TRUE;
 }
 
@@ -123,6 +133,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    int wmId, wmEvent;
+    PAINTSTRUCT ps;
+    HDC hdc;
+    HDC hdcBits;
+
     switch (message)
     {
     case WM_COMMAND:
@@ -147,6 +162,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: Add any drawing code that uses hdc here...
+            Rectangle(hdc, 1, 1, 10, 10);
+                hdcBits = ::CreateCompatibleDC(hdc);
+                SelectObject(hdcBits, startBitmap);
+                BitBlt(hdc, 0, 0, 60, 50, hdcBits, 0, 0, SRCCOPY);
+                DeleteDC(hdcBits);
             EndPaint(hWnd, &ps);
         }
         break;
