@@ -9,7 +9,6 @@
 // Global Variables:
 HWND hWnd;
 HBITMAP startBitmap;
-
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
@@ -20,6 +19,31 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
+void DrawStartButton()
+{
+    int i;
+    int toppos = GetSystemMetrics(SM_CYSCREEN) - 53;
+    HANDLE h;
+
+    ShowWindow(hWnd, SW_SHOW);
+    SetWindowPos(hWnd, HWND_TOPMOST, 4, toppos, 60, 50, SWP_SHOWWINDOW);
+    UpdateWindow(hWnd);
+    h=CreateEvent(0, true, false, "et");
+
+    for ( i = 0; i < 50; i++)
+    {
+        toppos=toppos-4;
+        SetWindowPos(hWnd, HWND_TOPMOST, 4, toppos, 60, 50, SWP_SHOWWINDOW);
+        WaitForSingleObject(h,15);
+    }
+
+       for ( i = 50; i > 0; i--)
+    {
+        toppos=toppos+4;
+        SetWindowPos(hWnd, HWND_TOPMOST, 4, toppos, 60, 50, SWP_SHOWWINDOW);
+        WaitForSingleObject(h,15);
+       }
+}
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -30,10 +54,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: Place code here.
-    startBitmap = (HBITMAP)::LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP1), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
+
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_STARTBUTTON, szWindowClass, MAX_LOADSTRING);
+    
+    startBitmap = (HBITMAP)::LoadImage(hInstance, MAKEINTRESOURCE(IDB_BITMAP1), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
+
+    
     MyRegisterClass(hInstance);
 
     // Perform application initialization:
@@ -46,9 +74,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
+
+    DrawStartButton();
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
     {
+        DrawStartButton();
+        
         if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
         {
             TranslateMessage(&msg);
